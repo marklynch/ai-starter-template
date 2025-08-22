@@ -13,8 +13,14 @@ A simple VSCode development container setup for testing and developing with Lang
 - Python 3.13 slim base image
 - All major LangChain packages pre-installed
 - Popular LLM integrations (OpenAI, Anthropic, Google, Ollama)
-- Vector stores (Chroma, Pinecone, FAISS)
+- Vector stores (Chroma, Pinecone, PostgreSQL, FAISS)
 - Document processing tools
+
+### 🗄️ Database Stack
+- **PostgreSQL 15** - Persistent database with vector storage support
+- **Redis 7** - Caching and session storage
+- **Automated setup** - Databases configured and ready to use
+- **Data persistence** - Volumes survive container rebuilds
 
 ### 🛠️ Development Tools
 - **Testing**: pytest with async support
@@ -36,17 +42,22 @@ A simple VSCode development container setup for testing and developing with Lang
 your-project/
 ├── .devcontainer/
 │   ├── devcontainer.json
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── docker-compose.yml
+├── sql/
+│   └── initdb.sql         # PostgreSQL initialization
 ├── examples/
-│   └── basic_example.py
+│   ├── basic_example.py
+│   ├── redis_example.py   # Redis integration examples
+│   └── postgres_example.py # PostgreSQL examples
 ├── tests/
 │   └── test_basic_langchain.py
-├── notebooks/          # For Jupyter notebooks
-├── data/              # For data files
+├── notebooks/             # For Jupyter notebooks
+├── data/                 # For data files
 ├── requirements.txt
 ├── setup.py
 ├── .env.example
-├── .env              # Your actual environment variables
+├── .env                  # Your actual environment variables
 └── README.md
 ```
 
@@ -56,9 +67,8 @@ your-project/
 
 On first build the script will copy `.env.example` to `.env` and add your API keys.
 
-By default this will read evnironment variables from your host environment such as 
-`OPENAI_API_KEY` and `ANTHROPIC_API_KEY` but you can use specific ones in the
-`.env` file if required.
+The container automatically reads environment variables from your host environment such as
+`OPENAI_API_KEY` and `ANTHROPIC_API_KEY` but you can override specific ones in the `.env` file if required.
 
 ### 2. Test Your Setup
 
@@ -71,6 +81,17 @@ python examples/basic_example.py
 This will:
 - Test LangChain components without API calls
 - Test a full chain with your configured LLM (if API key provided)
+### 3. Test Database Connections
+
+Test Redis integration:
+```bash
+python examples/redis_example.py
+```
+
+Test PostgreSQL integration:
+```bash
+python examples/postgres_example.py
+```
 
 ### 3. Run Tests
 
@@ -119,6 +140,31 @@ conversation = ConversationChain(
     verbose=True
 )
 ```
+
+### With Redis Caching
+```python
+from langchain_community.cache import RedisCache
+from langchain.globals import set_llm_cache
+import redis
+
+redis_client = redis.from_url("redis://redis:6379")
+cache = RedisCache(redis_=redis_client)
+set_llm_cache(cache)
+```
+
+### With PostgreSQL Vector Store
+```python
+from langchain_postgres import PGVector
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings()
+vectorstore = PGVector.from_documents(
+    documents=docs,
+    embedding=embeddings,
+    connection_string="postgresql://langchain:password@postgres:5432/langchain_dev"
+)
+```
+
 
 ### RAG Pattern
 ```python
@@ -173,8 +219,35 @@ RUN apt-get update && apt-get install -y \
 
 The container automatically forwards these ports:
 - **8000**: General web development
-- **8080**: Alternative web port  
+- **8080**: Alternative web port
 - **8888**: Jupyter Lab
+- **6379**: Redis
+- **5432**: PostgreSQL
+
+## Data Persistence
+
+### What Persists (Stored on Host)
+- Your source code and configuration files
+- Environment variables in `.env`
+- Data files you create in `data/`, `notebooks/`, etc.
+
+### What's Stored in Docker Volumes
+- **PostgreSQL data**: Persists across container rebuilds
+- **Redis data**: Persists across container rebuilds
+- **Python packages**: Reinstalled on rebuild (cached for speed)
+
+### Resetting Databases
+
+**Reset everything:**
+```bash
+docker-compose -f .devcontainer/docker-compose.yml down
+docker volume rm ai-poc_postgres-data ai-poc_redis-data
+```
+
+**Reset just PostgreSQL:**
+```bash
+docker volume rm ai-poc_postgres-data
+```
 
 ## Troubleshooting
 
@@ -205,4 +278,26 @@ The container automatically forwards these ports:
 - Set up LangSmith for tracing: https://smith.langchain.com/
 - Join the LangChain Discord community for support
 
-Happy coding with LangChain! 🦜🔗
+## Architecture
+
+This development environment provides a complete AI application stack:
+
+```
+┌───────────────────────────────────────-──┐
+│           VSCode Dev Container           │
+│  ┌─────────────────────────────────────┐ │
+│  │         Python + LangChain          │ │
+│  │     ┌─────────────────────────┐     │ │
+│  │     │    Your Application     │     │ │
+│  │     └─────────────────────────┘     │ │
+│  └─────────────────────────────────────┘ │
+│                      │                   │
+│  ┌─────────────────────────────────────┐ │
+│  │  Redis Container  │ PostgreSQL      │ │
+│  │  (Caching &       │ Container       │ │
+│  │   Sessions)       │ (Data & Vectors)│ │
+│  └─────────────────────────────────────┘ │
+└────────────────────────────────────────-─┘
+```
+
+Happy coding with LangChain! 🦜🔗🐘📮

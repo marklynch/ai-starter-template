@@ -11,8 +11,10 @@ services:
     command: sleep infinity
     environment:
       - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://langchain:password@postgres:5432/langchain_dev
     depends_on:
       - redis
+      - postgres
     networks:
       - langchain-net
 
@@ -28,8 +30,25 @@ services:
     networks:
       - langchain-net
 
+  # PostgreSQL container
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=langchain_dev
+      - POSTGRES_USER=langchain
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../sql/initdb.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - langchain-net
+
 volumes:
   redis-data:
+  postgres-data:
 
 networks:
   langchain-net:

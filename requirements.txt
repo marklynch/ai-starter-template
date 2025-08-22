@@ -16,7 +16,12 @@ langchain-ollama>=0.2.0
 # Vector stores
 langchain-chroma>=0.1.4
 langchain-pinecone>=0.2.0
+langchain-postgres>=0.0.6
 faiss-cpu>=1.8.0
+
+# Database drivers
+psycopg2-binary>=2.9.0
+asyncpg>=0.29.0
 
 # Document loaders and text processing
 pypdf2>=3.0.1

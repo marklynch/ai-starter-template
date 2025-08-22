@@ -39,6 +39,7 @@
         "python.testing.pytestArgs": [
           "tests"
         ],
+        "files.trimTrailingWhitespace": true,
         "jupyter.askForKernelRestart": false
       }
     }
@@ -59,7 +60,8 @@
     "PINECONE_ENVIRONMENT": "${localEnv:PINECONE_ENVIRONMENT}",
     "SERPAPI_API_KEY": "${localEnv:SERPAPI_API_KEY}",
     "HUGGINGFACE_API_TOKEN": "${localEnv:HUGGINGFACE_API_TOKEN}",
-    "REDIS_URL": "redis://redis:6379"
+    "REDIS_URL": "redis://redis:6379",
+    "DATABASE_URL": "postgresql://langchain:password@postgres:5432/langchain_dev"
   },
   "remoteUser": "vscode"
 }
