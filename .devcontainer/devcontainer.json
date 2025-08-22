@@ -1,0 +1,53 @@
+{
+  "name": "LangChain Python Development",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "onCreateCommand": "[ ! -f .env ] && cp .env.example .env && echo '⚠️ Created .env from .env.example - please add your API keys'; pip install -r requirements.txt",
+  "postCreateCommand": "mkdir -p tests notebooks data && pip install -e . && echo '✅ LangChain development environment ready!'",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-toolsai.jupyter",
+        "charliermarsh.ruff",
+        "ms-python.mypy-type-checker",
+        "ms-vscode.test-adapter-converter",
+        "littlefoxteam.vscode-python-test-adapter",
+        "redhat.vscode-yaml",
+        "ms-vscode.vscode-json"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.pythonPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
+        "python.linting.mypyEnabled": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "always"
+        },
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestArgs": [
+          "tests"
+        ],
+        "jupyter.askForKernelRestart": false
+      }
+    }
+  },
+  "forwardPorts": [
+    8000,
+    8080,
+    8888
+  ],
+  "remoteUser": "vscode"
+}
