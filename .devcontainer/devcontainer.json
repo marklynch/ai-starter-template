@@ -1,9 +1,8 @@
 {
   "name": "LangChain Python Development",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": "."
-  },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
   "onCreateCommand": "[ ! -f .env ] && cp .env.example .env && echo '⚠️ Created .env from .env.example.  You can add keys here or they can be read from host environment.'; pip install -r requirements.txt",
   "postCreateCommand": "mkdir -p tests notebooks data && pip install -e . && echo '✅ LangChain development environment ready!'",
   "features": {
@@ -60,7 +59,7 @@
     "PINECONE_ENVIRONMENT": "${localEnv:PINECONE_ENVIRONMENT}",
     "SERPAPI_API_KEY": "${localEnv:SERPAPI_API_KEY}",
     "HUGGINGFACE_API_TOKEN": "${localEnv:HUGGINGFACE_API_TOKEN}",
-    "REDIS_URL": "${localEnv:REDIS_URL}"
+    "REDIS_URL": "redis://redis:6379"
   },
   "remoteUser": "vscode"
 }

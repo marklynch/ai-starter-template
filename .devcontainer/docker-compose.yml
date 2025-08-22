@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Main development container
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    networks:
+      - langchain-net
+
+  # Redis container
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - langchain-net
+
+volumes:
+  redis-data:
+
+networks:
+  langchain-net:
