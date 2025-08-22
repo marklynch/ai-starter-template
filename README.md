@@ -1,17 +1,16 @@
 # LangChain Development Container
 
-A complete VSCode development container setup for testing and developing with LangChain.
+A simple VSCode development container setup for testing and developing with LangChain and Jupyter Notebooks
 
 ## Quick Start
 
 1. **Clone/create your project directory**
-2. **Create .env file** from the .env.example
-3. **Open in VSCode** and select "Reopen in Container" when prompted
+2. **Open in VSCode** and select "Reopen in Container" when prompted
 
 ## What's Included
 
 ### 🐍 Python Environment
-- Python 3.11 slim base image
+- Python 3.13 slim base image
 - All major LangChain packages pre-installed
 - Popular LLM integrations (OpenAI, Anthropic, Google, Ollama)
 - Vector stores (Chroma, Pinecone, FAISS)
@@ -55,12 +54,9 @@ your-project/
 
 ### 1. Environment Setup
 
-Copy `.env.example` to `.env` and add your API keys:
+On first build the script will copy `.env.example` to `.env` and add your API keys.
 
-```bash
-cp .env.example .env
-# Edit .env with your actual API keys
-```
+You need to add any keys you want to use.
 
 ### 2. Test Your Setup
 
