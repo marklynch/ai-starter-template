@@ -56,7 +56,9 @@ your-project/
 
 On first build the script will copy `.env.example` to `.env` and add your API keys.
 
-You need to add any keys you want to use.
+By default this will read evnironment variables from your host environment such as 
+`OPENAI_API_KEY` and `ANTHROPIC_API_KEY` but you can use specific ones in the
+`.env` file if required.
 
 ### 2. Test Your Setup
 
