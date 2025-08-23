@@ -3,6 +3,8 @@ PostgreSQL integration example with LangChain
 """
 import asyncio
 import os
+import sys
+import uuid
 
 import asyncpg
 import psycopg2
@@ -19,7 +21,7 @@ def get_database_url():
     database_url = os.getenv("DATABASE_URL", None)
     if not database_url:
         print("❌ DATABASE_URL not set! Please check your .env file.")
-        exit(1)
+        sys.exit(1)
     return database_url
 
 def test_postgres_connection():
@@ -36,7 +38,7 @@ def test_postgres_connection():
         # Test connection
         cursor.execute("SELECT version();")
         version = cursor.fetchone()
-        print(f"✅ PostgreSQL connection successful!")
+        print("✅ PostgreSQL connection successful!")
         print(f"📊 Version: {version['version'][:50]}...")
 
         # Test our initialized table
@@ -70,7 +72,7 @@ async def test_async_postgres():
     """Test async PostgreSQL connection using asyncpg"""
 
     database_url = get_database_url()
-    print(f"🔗 Testing async connection to PostgreSQL...")
+    print("🔗 Testing async connection to PostgreSQL...")
 
     try:
 
@@ -79,7 +81,7 @@ async def test_async_postgres():
 
         # Test connection
         version = await conn.fetchval("SELECT version();")
-        print(f"✅ Async PostgreSQL connection successful!")
+        print("✅ Async PostgreSQL connection successful!")
         print(f"📊 Version: {version[:50]}...")
 
         # Test query
@@ -117,10 +119,6 @@ def demo_conversation_storage():
     """Demonstrate storing conversation history in PostgreSQL"""
     database_url = get_database_url()
     try:
-        import uuid
-
-        import psycopg2
-        from psycopg2.extras import RealDictCursor
 
         conn = psycopg2.connect(database_url)
         cursor = conn.cursor(cursor_factory=RealDictCursor)
