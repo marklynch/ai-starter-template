@@ -45,14 +45,15 @@ your-project/
 │   ├── Dockerfile
 │   └── docker-compose.yml
 ├── sql/
-│   └── initdb.sql         # PostgreSQL initialization
+│   └── migrate           # Folder for SQL migration scripts
+│   └── initdb.sql        # PostgreSQL initialization
 ├── examples/
 │   ├── basic_example.py
-│   ├── redis_example.py   # Redis integration examples
+│   ├── redis_example.py  # Redis integration examples
 │   └── postgres_example.py # PostgreSQL examples
 ├── tests/
 │   └── test_basic_langchain.py
-├── notebooks/             # For Jupyter notebooks
+├── notebooks/            # For Jupyter notebooks
 ├── data/                 # For data files
 ├── requirements.txt
 ├── setup.py
@@ -214,6 +215,16 @@ RUN apt-get update && apt-get install -y \
     your-new-package \
     # ... existing packages
 ```
+
+### Adding SQL Tables
+The default DB uses the [Simple Schema Versions](https://github.com/marklynch/simple-schema-versions)
+pattern and functions to manage the db migrations.
+
+To update the initdb.sql you can run the following command and it will merge all migrations:
+```bash
+find migrate -name "*.sql" -type f | sort -V | while read file; do echo "-- source: $file";  cat "$file"; echo "\n"; done > initdb.sql
+```
+Note the DB persists between rebuilds - so you can manually run these scripts on the DB also.
 
 ## Port Forwarding
 
