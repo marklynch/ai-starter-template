@@ -4,11 +4,24 @@ This demonstrates a simple LangChain workflow
 """
 import os
 
+from callbacks import TokenUsageCallback
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
+
+# Available OpenAI models
+OPENAI_MODELS = {
+    # "gpt4": "gpt-4",
+    # "gpt4_turbo": "gpt-4-turbo",
+    "gpt4o": "gpt-4o",
+    "gpt4o_mini": "gpt-4o-mini",
+    "gpt5": "gpt-5",
+    "gpt5_mini": "gpt-5-mini",
+    # "gpt5_nano": "gpt-5-nano",
+    "gpt5_chat": "gpt-5-chat-latest"
+}
 
 # Load environment variables
 load_dotenv()
@@ -25,7 +38,7 @@ def main():
     try:
         # Initialize the LLM
         llm = ChatOpenAI(
-            model="gpt-3.5-turbo",
+            model=OPENAI_MODELS["gpt4o_mini"],
             temperature=0.7,
             max_tokens=150
         )
@@ -87,6 +100,52 @@ def test_without_api():
     print("\n🎉 Component tests passed! Your LangChain environment is ready.")
 
 
+def demo_advanced_openai():
+    """Demonstrate more advanced OpenAI features"""
+
+    if not os.getenv("OPENAI_API_KEY"):
+        print("⚠️  OPENAI_API_KEY not found - skipping advanced demo")
+        return
+
+    try:
+        print("🔬 Testing advanced OpenAI features...\n")
+
+        # Test different OpenAI models
+        models = list(OPENAI_MODELS.values())
+
+        for model in models:
+            print(f"🧪 Testing model: {model}")
+            llm = ChatOpenAI(
+                model=model,
+                temperature=0.3,
+                max_tokens=500,
+                verbose=False  # Set to True to see API details
+            )
+
+            prompt = ChatPromptTemplate.from_template(
+                "In exactly one sentence, what is artificial intelligence?"
+            )
+
+            # Create token usage callback
+            token_callback = TokenUsageCallback()
+
+            # Use the clean chain syntax with callback
+            chain = prompt | llm | StrOutputParser()
+            response = chain.invoke({}, config={"callbacks": [token_callback]})
+
+            if response and response.strip():
+                print(f"✅ {model}: {response}{token_callback.get_usage_string()}")
+            else:
+                print(f"⚠️ {model}: Empty response received{token_callback.get_usage_string()}")
+
+            print()  # Empty line for readability
+
+        print("🎯 Advanced OpenAI features tested!")
+
+    except Exception as e:
+        print(f"❌ Advanced demo error: {type(e).__name__}: {e}")
+
+
 if __name__ == "__main__":
     # Run component tests first (no API required)
     test_without_api()
@@ -95,3 +154,8 @@ if __name__ == "__main__":
 
     # Then try full example (requires API key)
     main()
+
+    print("\n" + "="*60 + "\n")
+
+    # Test advanced features
+    demo_advanced_openai()

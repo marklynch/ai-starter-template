@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- [FEATURE] Add callback for token counts
+
+### Changed
+- [CHANGE] Renamed basic_example to be openai_example to reflect it's function.
+
 
 ## [0.0.2]
 ### Added
